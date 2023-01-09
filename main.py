@@ -4,14 +4,14 @@
 
 # IMPORTS
 import random as rd
-from PIL import Image, ImageTk
 from tkinter import *
+from PIL import Image, ImageTk
 
 # CONSTANTS
 BACKGROUND_COLOR="#E0E0E0"
-HEIGHT=400
-WIDTH=400
-BORDER_SIZE=10
+SIZE=100
+IN_BETWEEN_SIZE=60
+SIZE_DIFFERENCE=IN_BETWEEN_SIZE/2.5
 
 class Board:
     def __init__(self) -> None:
@@ -27,7 +27,8 @@ class Board:
             if self.board[y][x]==0:
                 self.board[y][x]=self.turn
                 self.changeTurn()
-                if not self.checkWin():
+                self.graphics()
+                if self.checkWin()!=False:
                     self.win(self.checkWin())
                 elif self.checkDraw():
                     self.draw()
@@ -79,23 +80,70 @@ class Board:
         return True
     
     def win(self, winner):
-        print(winner+" a gagné !")
-        self.reset()
+        label.config(text="WINNN")
 
     def draw(self):
-        print("draw")
-        self.reset()
+        label.config(text="DRAWWW")
 
     def reset(self):
         self.__init__()
+        self.graphics()
 
     def graphics(self):
-        for row in self.board:
-            for value in row:
-                if value=="X":
-                    canvas.create_image(x*WIDTH/3 + BORDER_SIZE, y*HEIGHT/3+BORDER_SIZE, anchor="nw", image=xImage, tag="case")
+        canvas.delete('case')
+        for y in range(len(self.board)):
+            for x in range(len(self.board[0])):
+                if x==0:
+                    diffx=1
+                elif x==1:
+                    diffx=0
+                else:
+                    diffx=-1
+
+                if y==0:
+                    diffy=1
+                elif y==1:
+                    diffy=0
+                else:
+                    diffy=-1
+
+                if self.board[y][x]=="X":
+                        canvas.create_image(x*SIZE + x*IN_BETWEEN_SIZE + diffx * SIZE_DIFFERENCE, y*SIZE + y*IN_BETWEEN_SIZE + diffy * SIZE_DIFFERENCE, anchor="nw", image=crossImage, tag="case")
+                elif self.board[y][x]=="O":
+                    canvas.create_image(x*SIZE + x*IN_BETWEEN_SIZE + diffx * SIZE_DIFFERENCE, y*SIZE + y*IN_BETWEEN_SIZE + diffy * SIZE_DIFFERENCE, anchor="nw", image=circleImage, tag="case")
             
-                
+def click(event):
+    x=event.x
+    y=event.y
+
+    if not b.checkWin() and not b.checkDraw():
+        if x<=SIZE:
+            posx=0
+        elif SIZE+IN_BETWEEN_SIZE<=x<=SIZE*2+IN_BETWEEN_SIZE:
+            posx=1
+        elif (SIZE+IN_BETWEEN_SIZE)*2<=x<=SIZE*3+IN_BETWEEN_SIZE*2:
+            posx=2
+        else:
+            posx=-1
+
+        if y<=SIZE:
+            posy=0
+        elif SIZE+IN_BETWEEN_SIZE<=y<=SIZE*2+IN_BETWEEN_SIZE:
+            posy=1
+        elif (SIZE+IN_BETWEEN_SIZE)*2<=y<=SIZE*3+IN_BETWEEN_SIZE*2:
+            posy=2
+        else:
+            posy=-1
+
+        if posx!=-1 and posy!=-1:
+            b.playTurn(posx, posy)
+            turnText = "Actual player : "+str(b.turn)
+            turnLabel.configure(text=turnText)
+    else:
+        b.reset()
+
+
+b = Board()   
 
 window = Tk()
 window.title("TicTacToe Game")
@@ -104,7 +152,11 @@ window.resizable(False, False)
 label = Label(window, text="TicTacToe", font=("consolas", 20))
 label.pack()
 
-canvas = Canvas(window, bg=BACKGROUND_COLOR, height=HEIGHT, width=WIDTH)
+turnText = "Actual player : "+str(b.turn)
+turnLabel = Label(window, text=turnText, font=("consolas", 10))
+turnLabel.pack()
+
+canvas = Canvas(window, bg=BACKGROUND_COLOR, height=SIZE*3 + 2*IN_BETWEEN_SIZE, width=SIZE*3 + 2*IN_BETWEEN_SIZE)
 canvas.pack()
 
 window.update()
@@ -118,12 +170,15 @@ x = int((screenWidth/2) - (windowWidth/2))
 y = int((screenHeight/2) - (windowHeight/2))
 
 window.geometry(f"{windowWidth}x{windowHeight}+{x}+{y}")
-xImage=ImageTk.PhotoImage(Image.open("img/1.png").resize((int(WIDTH/3), int(HEIGHT/3))))
+crossImage=ImageTk.PhotoImage(Image.open("img/cross.png").resize((SIZE, SIZE)))
+circleImage=ImageTk.PhotoImage(Image.open("img/circle.png").resize((SIZE, SIZE)))
+backgroundImage=ImageTk.PhotoImage(Image.open("img/background.png").resize((SIZE*3 + 2*IN_BETWEEN_SIZE, SIZE*3 + 2*IN_BETWEEN_SIZE)))
+
+canvas.create_image(0, 0, anchor="nw", image=backgroundImage, tag="background")
 
 # BINDINGS
+window.bind('<Button-1>', click)
 
-
-b = Board()
 
 window.mainloop()
 
