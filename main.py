@@ -37,6 +37,20 @@ class Board:
         else:
             return "invalid choice"
 
+    def changeWinColor(self, color, way, i, j):
+        if way=="line":
+            for x in range(4):
+                self.board[i][j+x]=color+2
+        elif way=="collum":
+            for y in range(4):
+                self.board[i+y][j]=color+2
+        elif way=="diagonal1":
+            for x in range(4):
+                self.board[i+x][j+x]=color+2
+        elif way=="diagonal2":
+            for x in range(4):
+                self.board[i-x][j+x]=color+2
+
     # change self.turn attribute to the other player char 
     def changeTurn(self):
         if self.turn=="X":
@@ -142,7 +156,6 @@ def click(event):
     else:
         b.reset()
 
-
 b = Board()   
 
 window = Tk()
@@ -178,7 +191,6 @@ canvas.create_image(0, 0, anchor="nw", image=backgroundImage, tag="background")
 
 # BINDINGS
 window.bind('<Button-1>', click)
-
 
 window.mainloop()
 
