@@ -174,15 +174,6 @@ canvas.pack()
 
 window.update()
 
-windowWidth = window.winfo_width()
-windowHeight = window.winfo_height()
-screenWidth = window.winfo_screenwidth()
-screenHeight = window.winfo_screenheight()
-
-x = int((screenWidth/2) - (windowWidth/2))
-y = int((screenHeight/2) - (windowHeight/2))
-
-window.geometry(f"{windowWidth}x{windowHeight}+{x}+{y}")
 crossImage=ImageTk.PhotoImage(Image.open("img/cross.png").resize((SIZE, SIZE)))
 circleImage=ImageTk.PhotoImage(Image.open("img/circle.png").resize((SIZE, SIZE)))
 backgroundImage=ImageTk.PhotoImage(Image.open("img/background.png").resize((SIZE*3 + 2*IN_BETWEEN_SIZE, SIZE*3 + 2*IN_BETWEEN_SIZE)))
